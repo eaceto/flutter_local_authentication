@@ -1,0 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - flutter_local_authentication (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - flutter_local_authentication (from `.symlinks/plugins/flutter_local_authentication/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  flutter_local_authentication:
+    :path: ".symlinks/plugins/flutter_local_authentication/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  flutter_local_authentication: e48a5a01a8c36f5a65bbb6b6b19f6db691571e33
+
+PODFILE CHECKSUM: fe0e1ee7f3d1f7d00b11b474b62dd62134535aea
+
+COCOAPODS: 1.10.1
