@@ -26,7 +26,7 @@ static void flutter_local_authentication_plugin_handle_method_call(
 
   const gchar* method = fl_method_call_get_name(method_call);
 
-  if (strcmp(method, "getSupportsAuthentication") == 0) {
+  if (strcmp(method, "supportsAuthentication") == 0) {
     gboolean hasAccess = access(FLUTTER_FINGERPINT_FPRINTD_VERIFY, X_OK);
     g_autoptr(FlValue) result = fl_value_new_bool(hasAccess);
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));

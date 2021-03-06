@@ -13,13 +13,20 @@ public class SwiftFlutterLocalAuthenticationPlugin: NSObject, FlutterPlugin {
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    context.touchIDAuthenticationAllowableReuseDuration = 0
     switch call.method {
-    case "getSupportsAuthentication":
-        context.touchIDAuthenticationAllowableReuseDuration = 0
-        
+    case "supportsAuthentication":
         let (supports, error) = supportsLocalAuthentication(with: .deviceOwnerAuthenticationWithBiometrics)
-            
         result(supports && error == nil)
+    case "authenticate":
+        authenticate() { autheticated, error in
+            if let error = error {
+                let flutterError = FlutterError(code: "authentication_error", message: error.localizedDescription, details: nil)
+                result(flutterError)
+                return
+            }
+            result(autheticated)
+        }
     default:
         result(FlutterMethodNotImplemented)
     }
