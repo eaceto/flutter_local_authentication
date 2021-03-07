@@ -6,11 +6,11 @@
 
 #include <cstring>
 
-#define flutter_local_authentication_PLUGIN(obj) \
+#define FLUTTER_LOCAL_AUTHENTICATION_PLUGIN(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST((obj), flutter_local_authentication_plugin_get_type(), \
                               FlutterLocalAuthenticationPlugin))
 
-#define FLUTTER_FINGERPINT_FPRINTD_VERIFY "fprintd-verify"
+#define LINUX_FPRINTD_VERIFY "fprintd-verify"
 
 struct _FlutterLocalAuthenticationPlugin {
   GObject parent_instance;
@@ -26,11 +26,17 @@ static void flutter_local_authentication_plugin_handle_method_call(
 
   const gchar* method = fl_method_call_get_name(method_call);
 
-  if (strcmp(method, "getSupportsAuthentication") == 0) {
-    gboolean hasAccess = access(FLUTTER_FINGERPINT_FPRINTD_VERIFY, X_OK);
+  if (strcmp(method, "supportsAuthentication") == 0) {
+    gboolean hasAccess = access(LINUX_FPRINTD_VERIFY, X_OK);
     g_autoptr(FlValue) result = fl_value_new_bool(hasAccess);
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
-  } else {
+  } else if (strcmp(method, "authenticate") == 0) {
+    gboolean hasAccess = system(LINUX_FPRINTD_VERIFY) == 0;
+
+    g_autoptr(FlValue) result = fl_value_new_bool(hasAccess);
+    response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+  }  
+  else {
     response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
   }
 
@@ -50,12 +56,12 @@ static void flutter_local_authentication_plugin_init(FlutterLocalAuthenticationP
 
 static void method_call_cb(FlMethodChannel* channel, FlMethodCall* method_call,
                            gpointer user_data) {
-  FlutterLocalAuthenticationPlugin* plugin = flutter_local_authentication_PLUGIN(user_data);
+  FlutterLocalAuthenticationPlugin* plugin = FLUTTER_LOCAL_AUTHENTICATION_PLUGIN(user_data);
   flutter_local_authentication_plugin_handle_method_call(plugin, method_call);
 }
 
 void flutter_local_authentication_plugin_register_with_registrar(FlPluginRegistrar* registrar) {
-  FlutterLocalAuthenticationPlugin* plugin = flutter_local_authentication_PLUGIN(
+  FlutterLocalAuthenticationPlugin* plugin = FLUTTER_LOCAL_AUTHENTICATION_PLUGIN(
       g_object_new(flutter_local_authentication_plugin_get_type(), nullptr));
 
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();

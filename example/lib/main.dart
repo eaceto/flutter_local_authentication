@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:flutter_local_authentication/flutter_local_authentication.dart';
+import 'package:flutter/foundation.dart';
 
 void main() {
   runApp(MyApp());
@@ -19,27 +19,26 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    initPlatformState();
+    initSupportAuthenticationState();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    bool supportsLocalAuthentication = false;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      supportsLocalAuthentication =
-          await FlutterLocalAuthentication.supportsAuthentication;
-    } on PlatformException {
-      supportsLocalAuthentication = false;
-    }
+  Future<void> initSupportAuthenticationState() async {
+    bool supportsLocalAuthentication =
+        await FlutterLocalAuthentication.supportsAuthentication;
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
-
     setState(() {
       _supportsAuthentication = supportsLocalAuthentication;
+    });
+  }
+
+  void authenticate() async {
+    FlutterLocalAuthentication.authenticate().then((authenticated) {
+      String result = 'Authenticated: $authenticated';
+      debugPrint(result);
+    }).catchError((error) {
+      String result = 'Exception: $error';
+      debugPrint(result);
     });
   }
 
@@ -50,9 +49,18 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child:
-              Text('Supports Local Authentication: $_supportsAuthentication\n'),
+        body: Container(
+          margin: EdgeInsets.all(20.0),
+          child: ListView(
+            scrollDirection: Axis.vertical,
+            children: <Widget>[
+              Text('Local Authentication: $_supportsAuthentication\n'),
+              TextButton(
+                child: Text('Authenticated'),
+                onPressed: authenticate,
+              ),
+            ],
+          ),
         ),
       ),
     );

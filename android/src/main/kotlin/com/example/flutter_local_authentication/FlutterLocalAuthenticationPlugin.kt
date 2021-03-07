@@ -25,7 +25,7 @@ class FlutterLocalAuthenticationPlugin : FlutterPlugin, MethodCallHandler, Activ
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
-          "getSupportsAuthentication" -> result.success(supportsAuthentication())
+          "supportsAuthentication" -> result.success(supportsAuthentication())
           "authenticate" -> authenticate(result)
             else -> result.notImplemented()
         }
@@ -52,7 +52,7 @@ class FlutterLocalAuthenticationPlugin : FlutterPlugin, MethodCallHandler, Activ
                       override fun onAuthenticationError(errorCode: Int,
                                                          errString: CharSequence) {
                         super.onAuthenticationError(errorCode, errString)
-                        result.error("authentication_error_$errorCode", "$errString", null)
+                        result.error("authentication_error", "$errString", null)
                       }
 
                       override fun onAuthenticationSucceeded(
