@@ -16,7 +16,7 @@ public class FlutterLocalAuthenticationPlugin: NSObject, FlutterPlugin {
         context.touchIDAuthenticationAllowableReuseDuration = 0
         switch call.method {
         case "supportsAuthentication":
-            let (supports, error) = supportsLocalAuthentication(with: .deviceOwnerAuthenticationWithBiometrics)
+            let (supports, error) = supportsLocalAuthentication(with: .deviceOwnerAuthentication)
             result(supports && error == nil)
         case "authenticate":
             authenticate() { autheticated, error in
