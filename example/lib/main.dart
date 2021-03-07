@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:flutter_local_authentication/flutter_local_authentication.dart';
 import 'package:flutter/foundation.dart';
 
@@ -24,7 +23,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> initSupportAuthenticationState() async {
-    bool supportsLocalAuthentication = await FlutterLocalAuthentication.supportsAuthentication;
+    bool supportsLocalAuthentication =
+        await FlutterLocalAuthentication.supportsAuthentication;
 
     if (!mounted) return;
     setState(() {
@@ -33,11 +33,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   void authenticate() async {
-    FlutterLocalAuthentication
-        .authenticate()
-        .then((authenticated) {
-          String result = 'Authenticated: $authenticated';
-          debugPrint(result);
+    FlutterLocalAuthentication.authenticate().then((authenticated) {
+      String result = 'Authenticated: $authenticated';
+      debugPrint(result);
     }).catchError((error) {
       String result = 'Exception: $error';
       debugPrint(result);
@@ -52,7 +50,7 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Container(
-          margin: EdgeInsets.all( 20.0),
+          margin: EdgeInsets.all(20.0),
           child: ListView(
             scrollDirection: Axis.vertical,
             children: <Widget>[
