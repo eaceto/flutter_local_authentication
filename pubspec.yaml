@@ -1,6 +1,6 @@
 name: flutter_local_authentication
 description: A flutter plugin that allows access to Local Authentication / Biometrics on iOS, macOS, Linux and Android.
-version: 0.0.2
+version: 0.0.3
 homepage: https://github.com/eaceto/flutter_local_authentication
 repository: https://github.com/eaceto/flutter_local_authentication
 
