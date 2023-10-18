@@ -4,14 +4,14 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_local_authentication'
-  s.version          = '0.0.1'
-  s.summary          = 'A new Flutter project.'
+  s.version          = '1.0.0'
+  s.summary          = 'A flutter plugin that allows access to Local Authentication'
   s.description      = <<-DESC
-A new Flutter project.
+A flutter plugin that allows access to Local Authentication / Biometrics on iOS, macOS, Linux and Android.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://eaceto.dev'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Ezequiel (Kimi) Aceto' => 'ezequiel.aceto@gmail.com' }
 
   s.source           = { :path => '.' }
   s.source_files     = 'Classes/**/*'
