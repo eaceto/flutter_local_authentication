@@ -1,23 +1,78 @@
-import 'package:flutter/services.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_local_authentication/flutter_local_authentication.dart';
+import 'package:flutter_local_authentication/flutter_local_authentication_method_channel.dart';
+import 'package:flutter_local_authentication/flutter_local_authentication_platform_interface.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+
+class MockFlutterLocalAuthenticationPlatform
+    with MockPlatformInterfaceMixin
+    implements FlutterLocalAuthenticationPlatform {
+  final _canAuthenticate = true;
+  double touchIDAuthenticationAllowableReuseDuration = 0.0;
+
+  @override
+  Future<bool> authenticate() => Future.value(_canAuthenticate);
+
+  @override
+  Future<double> getTouchIDAuthenticationAllowableReuseDuration() =>
+      Future.value(touchIDAuthenticationAllowableReuseDuration);
+
+  @override
+  Future<double> setTouchIDAuthenticationAllowableReuseDuration(
+      double duration) {
+    touchIDAuthenticationAllowableReuseDuration = duration;
+    return Future.value(touchIDAuthenticationAllowableReuseDuration);
+  }
+
+  @override
+  Future<bool> canAuthenticate() => Future.value(_canAuthenticate);
+}
 
 void main() {
-  const MethodChannel channel = MethodChannel('flutter_local_authentication');
+  final FlutterLocalAuthenticationPlatform initialPlatform =
+      FlutterLocalAuthenticationPlatform.instance;
 
-  TestWidgetsFlutterBinding.ensureInitialized();
-
-  setUp(() {
-    channel.setMockMethodCallHandler((MethodCall methodCall) async {
-      return true;
-    });
+  test('$MethodChannelFlutterLocalAuthentication is the default instance', () {
+    expect(initialPlatform,
+        isInstanceOf<MethodChannelFlutterLocalAuthentication>());
   });
 
-  tearDown(() {
-    channel.setMockMethodCallHandler(null);
+  test('canAuthenticate', () async {
+    FlutterLocalAuthentication flutterLocalAuthenticationPlugin =
+        FlutterLocalAuthentication();
+    MockFlutterLocalAuthenticationPlatform fakePlatform =
+        MockFlutterLocalAuthenticationPlatform();
+    FlutterLocalAuthenticationPlatform.instance = fakePlatform;
+
+    expect(await flutterLocalAuthenticationPlugin.canAuthenticate(), true);
   });
 
-  test('supportsAuthentication', () async {
-    expect(await FlutterLocalAuthentication.supportsAuthentication, true);
+  test('authenticate', () async {
+    FlutterLocalAuthentication flutterLocalAuthenticationPlugin =
+        FlutterLocalAuthentication();
+    MockFlutterLocalAuthenticationPlatform fakePlatform =
+        MockFlutterLocalAuthenticationPlatform();
+    FlutterLocalAuthenticationPlatform.instance = fakePlatform;
+
+    expect(await flutterLocalAuthenticationPlugin.authenticate(), true);
+  });
+
+  test('touchIDAuthenticationAllowableReuseDuration', () async {
+    FlutterLocalAuthentication flutterLocalAuthenticationPlugin =
+        FlutterLocalAuthentication();
+    MockFlutterLocalAuthenticationPlatform fakePlatform =
+        MockFlutterLocalAuthenticationPlatform();
+    FlutterLocalAuthenticationPlatform.instance = fakePlatform;
+
+    expect(
+        await flutterLocalAuthenticationPlugin
+            .setTouchIDAuthenticationAllowableReuseDuration(30.0),
+        30.0);
+    await flutterLocalAuthenticationPlugin
+        .setTouchIDAuthenticationAllowableReuseDuration(60.0);
+    expect(
+        await flutterLocalAuthenticationPlugin
+            .getTouchIDAuthenticationAllowableReuseDuration(),
+        60.0);
   });
 }

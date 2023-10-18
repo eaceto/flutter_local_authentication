@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/flutter_local_authentication.iml" filepath="$PROJECT_DIR$/flutter_local_authentication.iml" />
       <module fileurl="file://$PROJECT_DIR$/android/flutter_local_authentication_android.iml" filepath="$PROJECT_DIR$/android/flutter_local_authentication_android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/example/android/flutter_local_authentication_example_android.iml" filepath="$PROJECT_DIR$/example/android/flutter_local_authentication_example_android.iml" />
     </modules>
   </component>
 </project>

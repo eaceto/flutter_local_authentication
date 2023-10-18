@@ -1,67 +1,97 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_local_authentication/flutter_local_authentication.dart';
-import 'package:flutter/foundation.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(MaterialApp(
+    title: 'SnackBar Demo',
+    home: Scaffold(
+      appBar: AppBar(
+        title: const Text('FlutterLocalAuthentication Demo'),
+      ),
+      body: const HomeWidget(),
+    ),
+  ));
 }
 
-class MyApp extends StatefulWidget {
+class HomeWidget extends StatefulWidget {
+  const HomeWidget({super.key});
+
   @override
-  _MyAppState createState() => _MyAppState();
+  State<HomeWidget> createState() => _HomeWidgetState();
 }
 
-class _MyAppState extends State<MyApp> {
-  bool _supportsAuthentication = false;
+class _HomeWidgetState extends State<HomeWidget> {
+  bool _canAuthenticate = false;
+  final _flutterLocalAuthenticationPlugin = FlutterLocalAuthentication();
 
   @override
   void initState() {
     super.initState();
-    initSupportAuthenticationState();
+    initPlatformState();
   }
 
-  Future<void> initSupportAuthenticationState() async {
-    bool supportsLocalAuthentication =
-        await FlutterLocalAuthentication.supportsAuthentication;
-
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initPlatformState() async {
     if (!mounted) return;
+    await checkSupport();
+  }
+
+  Future<void> checkSupport() async {
+    bool canAuthenticate;
+    try {
+      canAuthenticate =
+          await _flutterLocalAuthenticationPlugin.canAuthenticate();
+      await _flutterLocalAuthenticationPlugin
+          .setTouchIDAuthenticationAllowableReuseDuration(30);
+    } on Exception catch (error) {
+      debugPrint("Exception checking support. $error");
+      canAuthenticate = false;
+    }
+
     setState(() {
-      _supportsAuthentication = supportsLocalAuthentication;
+      _canAuthenticate = canAuthenticate;
     });
   }
 
   void authenticate() async {
-    FlutterLocalAuthentication.authenticate().then((authenticated) {
+    _flutterLocalAuthenticationPlugin.authenticate().then((authenticated) {
       String result = 'Authenticated: $authenticated';
       debugPrint(result);
+
+      String message = (authenticated == true)
+          ? 'LocalAuthentication verified!'
+          : 'Could not verify you identity';
+      final snackBar = SnackBar(content: Text(message));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }).catchError((error) {
       String result = 'Exception: $error';
       debugPrint(result);
+
+      const snackBar = SnackBar(
+          content: Text('There was an error performing the authentication...'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Container(
-          margin: EdgeInsets.all(20.0),
-          child: ListView(
-            scrollDirection: Axis.vertical,
-            children: <Widget>[
-              Text('Local Authentication: $_supportsAuthentication\n'),
-              TextButton(
-                child: Text('Authenticated'),
-                onPressed: authenticate,
-              ),
-            ],
+    return Container(
+      margin: const EdgeInsets.all(20.0),
+      child: ListView(
+        scrollDirection: Axis.vertical,
+        children: <Widget>[
+          Text('Supports Authentication: $_canAuthenticate\n'),
+          TextButton(
+            onPressed: checkSupport,
+            child: const Text('Check Support Again'),
           ),
-        ),
+          TextButton(
+            onPressed: authenticate,
+            child: const Text('Authenticate'),
+          ),
+        ],
       ),
     );
   }

@@ -4,20 +4,20 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_local_authentication'
-  s.version          = '0.0.1'
+  s.version          = '1.0.0'
   s.summary          = 'A new flutter plugin project.'
   s.description      = <<-DESC
-A new flutter plugin project.
+A flutter plugin that allows access to Local Authentication / Biometrics on iOS, macOS, Linux and Android.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://eaceto.dev'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Ezequiel (Kimi) Aceto' => 'ezequiel.aceto@gmail.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.framework = 'LocalAuthentication'
-    
+
   s.dependency 'Flutter'
-  s.platform = :ios, '10.0'
+  s.platform = :ios, '12.0'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
