@@ -1,0 +1,39 @@
+name: ci
+on:
+  pull_request:  
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+    branches:
+      - 'main'
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+permissions: write-all
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Run tests
+    if: |
+      github.repository_owner == 'eaceto' &&
+      github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+    # Checks out a copy of the repo.
+    - name: Check out code
+      uses: actions/checkout@v4
+    # Install Flutter stable version
+    - uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+    # Get dependencies
+    - run: flutter pub get
+    # Run tests    
+    - run: flutter test

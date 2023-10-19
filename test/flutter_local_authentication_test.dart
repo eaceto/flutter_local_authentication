@@ -8,20 +8,20 @@ class MockFlutterLocalAuthenticationPlatform
     with MockPlatformInterfaceMixin
     implements FlutterLocalAuthenticationPlatform {
   final _canAuthenticate = true;
-  double touchIDAuthenticationAllowableReuseDuration = 0.0;
+  double _touchIDAuthenticationAllowableReuseDuration = 0.0;
 
   @override
   Future<bool> authenticate() => Future.value(_canAuthenticate);
 
   @override
   Future<double> getTouchIDAuthenticationAllowableReuseDuration() =>
-      Future.value(touchIDAuthenticationAllowableReuseDuration);
+      Future.value(_touchIDAuthenticationAllowableReuseDuration);
 
   @override
   Future<double> setTouchIDAuthenticationAllowableReuseDuration(
       double duration) {
-    touchIDAuthenticationAllowableReuseDuration = duration;
-    return Future.value(touchIDAuthenticationAllowableReuseDuration);
+    _touchIDAuthenticationAllowableReuseDuration = duration;
+    return Future.value(_touchIDAuthenticationAllowableReuseDuration);
   }
 
   @override
@@ -68,15 +68,14 @@ void main() {
         MockFlutterLocalAuthenticationPlatform();
     FlutterLocalAuthenticationPlatform.instance = fakePlatform;
 
-    expect(
-        await flutterLocalAuthenticationPlugin
-            .setTouchIDAuthenticationAllowableReuseDuration(30.0),
-        30.0);
-    await flutterLocalAuthenticationPlugin
-        .setTouchIDAuthenticationAllowableReuseDuration(60.0);
-    expect(
-        await flutterLocalAuthenticationPlugin
-            .getTouchIDAuthenticationAllowableReuseDuration(),
-        60.0);
+    double stored = await flutterLocalAuthenticationPlugin
+        .setTouchIDAuthenticationAllowableReuseDuration(30.0);
+
+    expect(stored, 30.0);
+
+    stored = await flutterLocalAuthenticationPlugin
+        .setTouchIDAuthenticationAllowableReuseDuration(45.0);
+
+    expect(stored, 45.0);
   });
 }
