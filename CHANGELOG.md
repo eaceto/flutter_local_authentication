@@ -1,3 +1,7 @@
+## 1.2.0
+
+- Add GitHub actions for publishing releases to pub.dev automatically
+
 ## 1.1.0
 
 - Add a localization model for messages shown to the user
