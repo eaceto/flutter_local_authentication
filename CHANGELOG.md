@@ -1,6 +1,10 @@
 ## 1.2.0
 
 - Add GitHub actions for publishing releases to pub.dev automatically
+- Downgraded Flutter SDK
+- Requires:
+  - sdk: '>=3.1.0 <4.0.0'
+  - flutter: '3.0.0'
 
 ## 1.1.0
 
