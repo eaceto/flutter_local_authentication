@@ -26,6 +26,10 @@ class MockFlutterLocalAuthenticationPlatform
 
   @override
   Future<bool> canAuthenticate() => Future.value(_canAuthenticate);
+
+  @override
+  Future<void> setLocalizationModel(Map<String, dynamic> localizationModel) =>
+      Future.value();
 }
 
 void main() {

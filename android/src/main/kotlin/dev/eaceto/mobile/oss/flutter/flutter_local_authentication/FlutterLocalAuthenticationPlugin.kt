@@ -26,10 +26,11 @@ import io.flutter.plugin.common.MethodChannel.Result
 class FlutterLocalAuthenticationPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private lateinit var channel: MethodChannel
     private var activity: FlutterFragmentActivity? = null
+    private var localizationModel = LocalizationModel.default
 
     companion object {
         private const val CHANNEL = "flutter_local_authentication"
-        private val allowedAuthenticators = BiometricManager.Authenticators.BIOMETRIC_STRONG
+        private const val allowedAuthenticators = BiometricManager.Authenticators.BIOMETRIC_STRONG
             .or(BiometricManager.Authenticators.BIOMETRIC_WEAK)
             .or(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
     }
@@ -63,9 +64,11 @@ class FlutterLocalAuthenticationPlugin : FlutterPlugin, MethodCallHandler, Activ
      * @param result The result to send back to Flutter.
      */
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-        when (call.method) {
-            "canAuthenticate" -> result.success(canAuthenticate())
-            "authenticate" -> authenticate(result)
+        val method = PluginMethod.from(call)
+        when (method) {
+            is PluginMethod.CanAuthenticate -> result.success(canAuthenticate())
+            is PluginMethod.Authenticate -> authenticate(result)
+            is PluginMethod.SetLocalizationModel -> setLocalizationModel(method.model)
             else -> result.notImplemented()
         }
     }
@@ -107,9 +110,9 @@ class FlutterLocalAuthenticationPlugin : FlutterPlugin, MethodCallHandler, Activ
                 })
 
             val promptInfo = BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Local Authentication Required")
-                .setSubtitle("Validate access to this device.")
-                .setNegativeButtonText("Cancel")
+                .setTitle(localizationModel.dialogTitle)
+                .setSubtitle(localizationModel.reason)
+                .setNegativeButtonText(localizationModel.cancelButtonTitle)
                 .build()
 
             biometricPrompt.authenticate(promptInfo)
@@ -119,6 +122,12 @@ class FlutterLocalAuthenticationPlugin : FlutterPlugin, MethodCallHandler, Activ
                 "FragmentActivity is null. ",
                 "Beware that a FlutterFragmentActivity is required instead of a FlutterActivity."
             )
+        }
+    }
+
+    private fun setLocalizationModel(model: LocalizationModel?) {
+        model?.let {
+            localizationModel = it
         }
     }
 

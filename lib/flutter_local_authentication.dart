@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter_local_authentication/localization_model.dart';
+
 import 'flutter_local_authentication_platform_interface.dart';
 
 /// A Flutter plugin for local biometric authentication.
@@ -151,5 +153,35 @@ class FlutterLocalAuthentication {
           .getTouchIDAuthenticationAllowableReuseDuration();
     }
     return Future.value(0.0);
+  }
+
+  /// Sets the [LocalizationModel] for the Flutter Local Authentication plugin.
+  ///
+  /// This method allows you to specify a [LocalizationModel] to customize
+  /// the localized strings used in the biometric authentication prompts.
+  ///
+  /// Parameters:
+  ///
+  /// - `localizationModel`: A [LocalizationModel] containing the customized
+  ///   strings for localization.
+  ///
+  /// Example usage:
+  ///
+  /// ```dart
+  /// LocalizationModel customLocalization = LocalizationModel(
+  ///   promptDialogTitle: 'Custom Title',
+  ///   promptDialogReason: 'Custom Reason',
+  ///   cancelButtonTitle: 'Custom Cancel',
+  /// );
+  ///
+  /// flutterLocalAuthentication.setLocalizationModel(customLocalization);
+  /// ```
+  ///
+  /// Note: If you do not set a [LocalizationModel], the plugin will use
+  /// default localized strings in English.
+  void setLocalizationModel(LocalizationModel localizationModel) async {
+    if (Platform.isIOS || Platform.isMacOS || Platform.isAndroid) {
+      await FlutterLocalAuthenticationPlatform.instance.setLocalizationModel(localizationModel.toJson());
+    }
   }
 }

@@ -1,19 +1,24 @@
+//
+//  FlutterLocalAuthenticationPlugin.swift
+//  flutter_local_authentication
+//
+//  Created by Ezequiel (Kimi) Aceto on 19/10/23.
+//  Contact: ezequiel.aceto@gmail.com
+//  WebSite: https://eaceto.dev
+
 import Flutter
 import Foundation
 import LocalAuthentication
 
-/// A Flutter plugin for local biometric authentication.
+/// A Flutter plugin for local biometric authentication on iOS.
 ///
 /// This plugin provides methods to check for biometric authentication support,
 /// perform biometric authentication, and manage Touch ID authentication settings
 /// on iOS devices.
-///
-/// Author: Ezequiel (Kimi) Aceto
-/// Email: ezequiel.aceto@gmail.com
-/// Website: https://eaceto.dev
 public class FlutterLocalAuthenticationPlugin: NSObject, FlutterPlugin {
 
     let context = LAContext()
+    var localizationModel = LocalizationModel.default
 
     /// Registers the plugin with the Flutter engine.
     ///
@@ -31,12 +36,15 @@ public class FlutterLocalAuthenticationPlugin: NSObject, FlutterPlugin {
     ///   - call: The method call received from Flutter.
     ///   - result: The result callback to send the response back to Flutter.
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        switch call.method {
-        case "canAuthenticate":
+        guard let method = PluginMethod.from(call) else {
+            return result(FlutterMethodNotImplemented)
+        }
+        switch method {
+        case .canAuthenticate:
             let (supports, error) = supportsLocalAuthentication(with: .deviceOwnerAuthenticationWithBiometrics)
             result(supports && error == nil)
-        case "authenticate":
-            authenticate() { autheticated, error in
+        case .authenticate:
+            authenticate { autheticated, error in
                 if let error = error {
                     let flutterError = FlutterError(code: "authentication_error", message: error.localizedDescription, details: nil)
                     result(flutterError)
@@ -44,15 +52,15 @@ public class FlutterLocalAuthenticationPlugin: NSObject, FlutterPlugin {
                 }
                 result(autheticated)
             }
-        case "setTouchIDAuthenticationAllowableReuseDuration":
-            let arguments = call.arguments as? [String: Any]
-            let duration: Double = arguments?["duration"] as? Double ?? 0.0
+        case .setTouchIDAuthenticationAllowableReuseDuration(let duration):
             setTouchIDAuthenticationAllowableReuseDuration(duration)
             return result(context.touchIDAuthenticationAllowableReuseDuration)
-        case "getTouchIDAuthenticationAllowableReuseDuration":
+        case .getTouchIDAuthenticationAllowableReuseDuration:
             return result(context.touchIDAuthenticationAllowableReuseDuration)
-        default:
-            result(FlutterMethodNotImplemented)
+        case .setLocalizationModel(let model):
+            if let model {
+                localizationModel = model
+            }
         }
     }
 
@@ -73,23 +81,22 @@ public class FlutterLocalAuthenticationPlugin: NSObject, FlutterPlugin {
     ///   - policy: The authentication policy to use.
     ///   - callback: A callback to handle the authentication result.
     fileprivate func authenticate(with policy: LAPolicy = .deviceOwnerAuthenticationWithBiometrics, callback: @escaping (Bool, Error?) -> Void) {
-        let reason = "Validate that you have access to this device."
-        context.evaluatePolicy(policy, localizedReason: reason, reply: callback)
+        context.evaluatePolicy(policy, localizedReason: localizationModel.reason, reply: callback)
     }
 
-    /// Sets the allowable reuse duration for Touch ID authentication (iOS only).
+    /// Sets the allowable reuse duration for Touch ID authentication.
     ///
     /// - Parameters:
     ///   - duration: The allowable reuse duration in seconds.
     fileprivate func setTouchIDAuthenticationAllowableReuseDuration(_ duration: Double) {
         var duration = duration
-        if (duration > LATouchIDAuthenticationMaximumAllowableReuseDuration) {
+        if duration > LATouchIDAuthenticationMaximumAllowableReuseDuration {
             duration = LATouchIDAuthenticationMaximumAllowableReuseDuration
         }
         context.touchIDAuthenticationAllowableReuseDuration = duration
     }
 
-    /// Retrieves the allowable reuse duration for Touch ID authentication (iOS only).
+    /// Retrieves the allowable reuse duration for Touch ID authentication.
     ///
     /// - Returns: The allowable reuse duration in seconds.
     fileprivate func getTouchIDAuthenticationAllowableReuseDuration() -> Double {

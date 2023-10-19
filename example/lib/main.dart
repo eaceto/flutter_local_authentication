@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_authentication/flutter_local_authentication.dart';
+import 'package:flutter_local_authentication/localization_model.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -36,6 +37,13 @@ class _HomeWidgetState extends State<HomeWidget> {
   Future<void> initPlatformState() async {
     if (!mounted) return;
     await checkSupport();
+
+    final localization = LocalizationModel(
+        promptDialogTitle: "title for dialog",
+        promptDialogReason: "reason for prompting biometric",
+        cancelButtonTitle: "cancel"
+    );
+    _flutterLocalAuthenticationPlugin.setLocalizationModel(localization);
   }
 
   Future<void> checkSupport() async {

@@ -1,3 +1,7 @@
+## 1.1.0
+
+- Add a localization model for messages shown to the user
+
 ## 1.0.0
 
 - Implemented 'setTouchIDAuthenticationAllowableReuseDuration' for iOS and macOS

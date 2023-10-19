@@ -68,4 +68,10 @@ abstract class FlutterLocalAuthenticationPlatform extends PlatformInterface {
     throw UnimplementedError(
         'getTouchIDAuthenticationAllowableReuseDuration() has not been implemented.');
   }
+
+  Future<void> setLocalizationModel(
+      Map<String, dynamic> localizationModel) async {
+    throw UnimplementedError(
+        'setLocalizationModel() has not been implemented.');
+  }
 }

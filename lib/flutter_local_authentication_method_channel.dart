@@ -96,4 +96,10 @@ class MethodChannelFlutterLocalAuthentication
             'getTouchIDAuthenticationAllowableReuseDuration') ??
         0.0;
   }
+
+  @override
+  Future<void> setLocalizationModel(
+      Map<String, dynamic> localizationModel) async {
+    await methodChannel.invokeMethod('setLocalizationModel', localizationModel);
+  }
 }
