@@ -18,6 +18,7 @@ import LocalAuthentication
 public class FlutterLocalAuthenticationPlugin: NSObject, FlutterPlugin {
 
     let context = LAContext()
+    var authPolicy = LAPolicy.deviceOwnerAuthenticationWithBiometrics;
     var localizationModel = LocalizationModel.default
 
     /// Registers the plugin with the Flutter engine.
@@ -41,16 +42,16 @@ public class FlutterLocalAuthenticationPlugin: NSObject, FlutterPlugin {
         }
         switch method {
         case .canAuthenticate:
-            let (supports, error) = supportsLocalAuthentication(with: .deviceOwnerAuthenticationWithBiometrics)
+            let (supports, error) = supportsLocalAuthentication(with: authPolicy)
             result(supports && error == nil)
         case .authenticate:
-            authenticate { autheticated, error in
+            authenticate(with: authPolicy) { authenticated, error in
                 if let error = error {
                     let flutterError = FlutterError(code: "authentication_error", message: error.localizedDescription, details: nil)
                     result(flutterError)
                     return
                 }
-                result(autheticated)
+                result(authenticated)
             }
         case .setTouchIDAuthenticationAllowableReuseDuration(let duration):
             setTouchIDAuthenticationAllowableReuseDuration(duration)
@@ -61,6 +62,8 @@ public class FlutterLocalAuthenticationPlugin: NSObject, FlutterPlugin {
             if let model {
                 localizationModel = model
             }
+        case .setBiometricsRequired(let biometricsRequired):
+            setBiometricsRequired(biometricsRequired)
         }
     }
 
@@ -80,7 +83,7 @@ public class FlutterLocalAuthenticationPlugin: NSObject, FlutterPlugin {
     /// - Parameters:
     ///   - policy: The authentication policy to use.
     ///   - callback: A callback to handle the authentication result.
-    fileprivate func authenticate(with policy: LAPolicy = .deviceOwnerAuthenticationWithBiometrics, callback: @escaping (Bool, Error?) -> Void) {
+    fileprivate func authenticate(with policy: LAPolicy, callback: @escaping (Bool, Error?) -> Void) {
         context.evaluatePolicy(policy, localizedReason: localizationModel.reason, reply: callback)
     }
 
@@ -101,5 +104,13 @@ public class FlutterLocalAuthenticationPlugin: NSObject, FlutterPlugin {
     /// - Returns: The allowable reuse duration in seconds.
     fileprivate func getTouchIDAuthenticationAllowableReuseDuration() -> Double {
         return context.touchIDAuthenticationAllowableReuseDuration
+    }
+
+    fileprivate func setBiometricsRequired(_ biometricsRequired: Bool) {
+        if biometricsRequired {
+            authPolicy = LAPolicy.deviceOwnerAuthenticationWithBiometrics
+        } else {
+            authPolicy = LAPolicy.deviceOwnerAuthentication
+        }
     }
 }
