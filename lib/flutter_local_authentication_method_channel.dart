@@ -102,4 +102,10 @@ class MethodChannelFlutterLocalAuthentication
       Map<String, dynamic> localizationModel) async {
     await methodChannel.invokeMethod('setLocalizationModel', localizationModel);
   }
+
+  @override
+  Future<void> setBiometricsRequired(
+      bool biometricsRequired) async {
+    await methodChannel.invokeMethod('setBiometricsRequired', {'biometricsRequired': biometricsRequired});
+  }
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_authentication/flutter_local_authentication.dart';
@@ -44,6 +45,10 @@ class _HomeWidgetState extends State<HomeWidget> {
         cancelButtonTitle: "cancel"
     );
     _flutterLocalAuthenticationPlugin.setLocalizationModel(localization);
+
+    if (Platform.isIOS) {
+      _flutterLocalAuthenticationPlugin.setBiometricsRequired(false);
+    }
   }
 
   Future<void> checkSupport() async {

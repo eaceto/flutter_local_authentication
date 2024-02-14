@@ -74,4 +74,11 @@ abstract class FlutterLocalAuthenticationPlatform extends PlatformInterface {
     throw UnimplementedError(
         'setLocalizationModel() has not been implemented.');
   }
+  
+  /// Sets whether biometrics are required (iOS only).
+  Future<void> setBiometricsRequired(
+      bool biometricsRequired) {
+    throw UnimplementedError(
+        'setBiometricsRequired() has not been implemented.');
+  }
 }

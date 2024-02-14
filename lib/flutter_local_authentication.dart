@@ -184,4 +184,12 @@ class FlutterLocalAuthentication {
       await FlutterLocalAuthenticationPlatform.instance.setLocalizationModel(localizationModel.toJson());
     }
   }
+
+  Future<void> setBiometricsRequired(
+      bool biometricsRequired) async {
+    if (Platform.isIOS) {
+      return await FlutterLocalAuthenticationPlatform.instance
+          .setBiometricsRequired(biometricsRequired);
+    }
+  }
 }
