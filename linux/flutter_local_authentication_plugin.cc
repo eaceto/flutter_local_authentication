@@ -12,6 +12,8 @@
 
 // Define the path for the "fprintd-verify" executable
 #define LINUX_FPRINTD_VERIFY "fprintd-verify"
+// Define the "fprintd-list $USER" command
+#define LINUX_FPRINTD_LIST "fprintd-list $USER"
 
 // Macro to cast the plugin object
 #define FLUTTER_LOCAL_AUTHENTICATION_PLUGIN(obj)                                     \
@@ -50,8 +52,8 @@ static void flutter_local_authentication_plugin_handle_method_call(
 
   if (strcmp(method, "canAuthenticate") == 0)
   {
-    // Check if the "fprintd-verify" executable is accessible
-    gboolean hasAccess = access(LINUX_FPRINTD_VERIFY, X_OK);
+    // Execute the "fprintd-list $USER" command and check the return status
+    gboolean hasAccess = system(LINUX_FPRINTD_LIST) == 0;
     g_autoptr(FlValue) result = fl_value_new_bool(hasAccess);
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
   }
