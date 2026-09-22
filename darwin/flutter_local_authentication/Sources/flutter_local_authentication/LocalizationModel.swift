@@ -4,7 +4,7 @@
 //
 //  Created by Ezequiel (Kimi) Aceto on 19/10/23.
 //  Contact: ezequiel.aceto@gmail.com
-//  WebSite: https://eaceto.dev
+//  WebSite: https://kimi.blog
 
 import Foundation
 
@@ -18,7 +18,7 @@ struct LocalizationModel {
     let reason: String
     let cancelButtonTitle: String
 
-    static var `default` = LocalizationModel(
+    static let `default` = LocalizationModel(
         dialogTitle: "",
         reason: "Validate that you have access to this device.",
         cancelButtonTitle: "Cancel"

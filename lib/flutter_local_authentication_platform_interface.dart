@@ -1,5 +1,8 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+import 'authentication_availability.dart';
+import 'authentication_method.dart';
+import 'biometry_type.dart';
 import 'flutter_local_authentication_method_channel.dart';
 
 /// An abstract platform interface for the Flutter Local Authentication plugin.
@@ -9,7 +12,7 @@ import 'flutter_local_authentication_method_channel.dart';
 ///
 /// Author: Ezequiel (Kimi) Aceto
 /// Email: ezequiel.aceto@gmail.com
-/// Website: https://eaceto.dev
+/// Website: https://kimi.blog
 abstract class FlutterLocalAuthenticationPlatform extends PlatformInterface {
   FlutterLocalAuthenticationPlatform() : super(token: _token);
 
@@ -33,8 +36,11 @@ abstract class FlutterLocalAuthenticationPlatform extends PlatformInterface {
 
   /// Checks whether biometric authentication is available on the device.
   ///
-  /// Returns `true` if biometric authentication is available, `false` otherwise.
-  Future<bool> canAuthenticate() {
+  /// Returns `true` if the user can authenticate with the given [method],
+  /// `false` otherwise (including when the platform does not support it).
+  Future<bool> canAuthenticate({
+    AuthenticationMethod method = AuthenticationMethod.biometricsOnly,
+  }) {
     throw UnimplementedError('canAuthenticate() has not been implemented.');
   }
 
@@ -44,8 +50,34 @@ abstract class FlutterLocalAuthenticationPlatform extends PlatformInterface {
   /// authenticate using their fingerprint, face, or other biometric methods
   /// supported by the device. If the user successfully authenticates, the method
   /// returns `true`. If authentication fails or is canceled, it returns `false`.
-  Future<bool> authenticate() {
+  ///
+  /// The [method] defines which authenticators the user is allowed to use.
+  Future<bool> authenticate({
+    AuthenticationMethod method = AuthenticationMethod.biometricsOnly,
+  }) {
     throw UnimplementedError('authenticate() has not been implemented.');
+  }
+
+  /// Tells whether the user can authenticate with the given [method], and the
+  /// reason why when they can not.
+  Future<AuthenticationAvailability> getAvailability({
+    AuthenticationMethod method = AuthenticationMethod.biometricsOnly,
+  }) {
+    throw UnimplementedError('getAvailability() has not been implemented.');
+  }
+
+  /// Returns the kind of biometrics of the device.
+  Future<BiometryType> getBiometryType() {
+    throw UnimplementedError('getBiometryType() has not been implemented.');
+  }
+
+  /// Dismisses the authentication prompt that is being shown, if any.
+  ///
+  /// Returns `true` if there was a prompt to dismiss, `false` otherwise.
+  Future<bool> cancelAuthentication() {
+    throw UnimplementedError(
+      'cancelAuthentication() has not been implemented.',
+    );
   }
 
   /// Sets the allowable reuse duration for Touch ID authentication (iOS only).
@@ -54,9 +86,11 @@ abstract class FlutterLocalAuthenticationPlatform extends PlatformInterface {
   /// for reusing a previously authenticated Touch ID (fingerprint) to unlock an
   /// app or perform secure actions. This duration is specified in seconds.
   Future<double> setTouchIDAuthenticationAllowableReuseDuration(
-      double duration) {
+    double duration,
+  ) {
     throw UnimplementedError(
-        'setTouchIDAuthenticationAllowableReuseDuration() has not been implemented.');
+      'setTouchIDAuthenticationAllowableReuseDuration() has not been implemented.',
+    );
   }
 
   /// Retrieves the allowable reuse duration for Touch ID authentication (iOS only).
@@ -66,12 +100,15 @@ abstract class FlutterLocalAuthenticationPlatform extends PlatformInterface {
   /// app or perform secure actions. This duration is specified in seconds.
   Future<double> getTouchIDAuthenticationAllowableReuseDuration() {
     throw UnimplementedError(
-        'getTouchIDAuthenticationAllowableReuseDuration() has not been implemented.');
+      'getTouchIDAuthenticationAllowableReuseDuration() has not been implemented.',
+    );
   }
 
   Future<void> setLocalizationModel(
-      Map<String, dynamic> localizationModel) async {
+    Map<String, dynamic> localizationModel,
+  ) async {
     throw UnimplementedError(
-        'setLocalizationModel() has not been implemented.');
+      'setLocalizationModel() has not been implemented.',
+    );
   }
 }

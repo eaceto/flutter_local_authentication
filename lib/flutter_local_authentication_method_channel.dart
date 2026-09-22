@@ -1,13 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import 'authentication_availability.dart';
+import 'authentication_method.dart';
+import 'biometry_type.dart';
 import 'flutter_local_authentication_platform_interface.dart';
 
 /// An implementation of [FlutterLocalAuthenticationPlatform] that uses method channels.
 ///
 /// Author: Ezequiel (Kimi) Aceto
 /// Email: ezequiel.aceto@gmail.com
-/// Website: https://eaceto.dev
+/// Website: https://kimi.blog
 class MethodChannelFlutterLocalAuthentication
     extends FlutterLocalAuthenticationPlatform {
   /// The method channel used to interact with the native platform.
@@ -25,8 +28,13 @@ class MethodChannelFlutterLocalAuthentication
   /// Throws an exception if there's an issue checking the device's support for
   /// biometric authentication.
   @override
-  Future<bool> canAuthenticate() async {
-    return await methodChannel.invokeMethod<bool>('canAuthenticate') ?? false;
+  Future<bool> canAuthenticate({
+    AuthenticationMethod method = AuthenticationMethod.biometricsOnly,
+  }) async {
+    return await methodChannel.invokeMethod<bool>('canAuthenticate', {
+          'method': method.name,
+        }) ??
+        false;
   }
 
   /// Requests biometric authentication using the Flutter Local Authentication plugin.
@@ -43,8 +51,52 @@ class MethodChannelFlutterLocalAuthentication
   ///
   /// Throws an exception if there's an issue with the authentication process.
   @override
-  Future<bool> authenticate() async {
-    return await methodChannel.invokeMethod<bool>('authenticate') ?? false;
+  Future<bool> authenticate({
+    AuthenticationMethod method = AuthenticationMethod.biometricsOnly,
+  }) async {
+    return await methodChannel.invokeMethod<bool>('authenticate', {
+          'method': method.name,
+        }) ??
+        false;
+  }
+
+  /// Tells whether the user can authenticate with the given [method], and the
+  /// reason why when they can not.
+  ///
+  /// A value that is not known is reported as
+  /// [AuthenticationAvailability.notAvailable].
+  @override
+  Future<AuthenticationAvailability> getAvailability({
+    AuthenticationMethod method = AuthenticationMethod.biometricsOnly,
+  }) async {
+    final name = await methodChannel.invokeMethod<String>('getAvailability', {
+      'method': method.name,
+    });
+    return AuthenticationAvailability.values.firstWhere(
+      (availability) => availability.name == name,
+      orElse: () => AuthenticationAvailability.notAvailable,
+    );
+  }
+
+  /// Returns the kind of biometrics of the device.
+  ///
+  /// A value that is not known is reported as [BiometryType.none].
+  @override
+  Future<BiometryType> getBiometryType() async {
+    final name = await methodChannel.invokeMethod<String>('getBiometryType');
+    return BiometryType.values.firstWhere(
+      (biometryType) => biometryType.name == name,
+      orElse: () => BiometryType.none,
+    );
+  }
+
+  /// Dismisses the authentication prompt that is being shown, if any.
+  ///
+  /// Returns `true` if there was a prompt to dismiss, `false` otherwise.
+  @override
+  Future<bool> cancelAuthentication() async {
+    return await methodChannel.invokeMethod<bool>('cancelAuthentication') ??
+        false;
   }
 
   /// Sets the allowable reuse duration for Touch ID authentication (iOS only).
@@ -67,10 +119,12 @@ class MethodChannelFlutterLocalAuthentication
   /// duration or if it's not supported on the current platform.
   @override
   Future<double> setTouchIDAuthenticationAllowableReuseDuration(
-      double duration) async {
+    double duration,
+  ) async {
     return await methodChannel.invokeMethod<double>(
-            'setTouchIDAuthenticationAllowableReuseDuration',
-            {"duration": duration}) ??
+          'setTouchIDAuthenticationAllowableReuseDuration',
+          {"duration": duration},
+        ) ??
         0.0;
   }
 
@@ -93,13 +147,15 @@ class MethodChannelFlutterLocalAuthentication
   @override
   Future<double> getTouchIDAuthenticationAllowableReuseDuration() async {
     return await methodChannel.invokeMethod<double>(
-            'getTouchIDAuthenticationAllowableReuseDuration') ??
+          'getTouchIDAuthenticationAllowableReuseDuration',
+        ) ??
         0.0;
   }
 
   @override
   Future<void> setLocalizationModel(
-      Map<String, dynamic> localizationModel) async {
+    Map<String, dynamic> localizationModel,
+  ) async {
     await methodChannel.invokeMethod('setLocalizationModel', localizationModel);
   }
 }

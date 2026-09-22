@@ -1,0 +1,61 @@
+site_name: flutter_local_authentication
+site_description: A Flutter plugin for Local Authentication / Biometrics on Android, iOS, macOS and Linux.
+site_url: https://eaceto.github.io/flutter_local_authentication/
+repo_url: https://github.com/eaceto/flutter_local_authentication
+repo_name: eaceto/flutter_local_authentication
+edit_uri: edit/main/docs/
+exclude_docs: |
+  requirements.txt
+copyright: Copyright &copy; Ezequiel (Kimi) Aceto
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+nav:
+  - Home: index.md
+  - Getting started:
+      - Installation: getting-started/installation.md
+      - Platform setup: getting-started/platform-setup.md
+      - Quick start: getting-started/quick-start.md
+  - Guides:
+      - Authentication methods: guides/authentication-methods.md
+      - Availability and biometry type: guides/availability.md
+      - Error handling: guides/error-handling.md
+      - Dismissing the prompt: guides/cancel.md
+      - Localization: guides/localization.md
+      - Touch ID reuse duration: guides/touch-id-reuse.md
+  - Reference:
+      - API reference: reference/api.md
+      - Platform behaviour: reference/platforms.md
+      - Dart API docs (dartdoc): https://eaceto.github.io/flutter_local_authentication/api/
+  - Migrating to 2.0: migration.md
+  - Changelog: https://github.com/eaceto/flutter_local_authentication/blob/main/CHANGELOG.md

@@ -1,10 +1,11 @@
 package dev.eaceto.mobile.oss.flutter.flutter_local_authentication
 
+import android.content.Context
 import androidx.annotation.NonNull
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
-import io.flutter.embedding.android.FlutterFragmentActivity
+import androidx.fragment.app.FragmentActivity
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -21,18 +22,18 @@ import io.flutter.plugin.common.MethodChannel.Result
  *
  * Author: Ezequiel (Kimi) Aceto
  * Email: ezequiel.aceto@gmail.com
- * Website: https://eaceto.dev
+ * Website: https://kimi.blog
  */
 class FlutterLocalAuthenticationPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private lateinit var channel: MethodChannel
-    private var activity: FlutterFragmentActivity? = null
+    /** The host activity, when it is a [FragmentActivity] as required by [BiometricPrompt]. */
+    private var activity: FragmentActivity? = null
+    private var applicationContext: Context? = null
+    private var currentPrompt: BiometricPrompt? = null
     private var localizationModel = LocalizationModel.default
 
     companion object {
         private const val CHANNEL = "flutter_local_authentication"
-        private const val allowedAuthenticators = BiometricManager.Authenticators.BIOMETRIC_STRONG
-            .or(BiometricManager.Authenticators.BIOMETRIC_WEAK)
-            .or(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
     }
 
     /**
@@ -44,6 +45,7 @@ class FlutterLocalAuthenticationPlugin : FlutterPlugin, MethodCallHandler, Activ
      */
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, CHANNEL)
+        applicationContext = flutterPluginBinding.applicationContext
     }
 
     /**
@@ -55,6 +57,7 @@ class FlutterLocalAuthenticationPlugin : FlutterPlugin, MethodCallHandler, Activ
      */
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
+        applicationContext = null
     }
 
     /**
@@ -66,38 +69,94 @@ class FlutterLocalAuthenticationPlugin : FlutterPlugin, MethodCallHandler, Activ
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         val method = PluginMethod.from(call)
         when (method) {
-            is PluginMethod.CanAuthenticate -> result.success(canAuthenticate())
-            is PluginMethod.Authenticate -> authenticate(result)
-            is PluginMethod.SetLocalizationModel -> setLocalizationModel(method.model)
+            is PluginMethod.CanAuthenticate -> method.method?.let {
+                result.success(canAuthenticate(it))
+            } ?: unknownAuthenticationMethod(result)
+            is PluginMethod.GetAvailability -> method.method?.let {
+                result.success(availability(it).key)
+            } ?: unknownAuthenticationMethod(result)
+            is PluginMethod.GetBiometryType -> result.success(biometryType().key)
+            is PluginMethod.Authenticate -> method.method?.let {
+                authenticate(it, result)
+            } ?: unknownAuthenticationMethod(result)
+            is PluginMethod.CancelAuthentication -> result.success(cancelAuthentication())
+            is PluginMethod.SetLocalizationModel -> {
+                setLocalizationModel(method.model)
+                result.success(null)
+            }
             else -> result.notImplemented()
         }
     }
 
-    /**
-     * Checks if biometric authentication is supported on the device.
-     *
-     * @return `true` if biometric authentication is supported, `false` otherwise.
-     */
-    private fun canAuthenticate(): Boolean {
-        val biometricManager = BiometricManager.from(activity!!)
-        return when (biometricManager.canAuthenticate(allowedAuthenticators)) {
-            BiometricManager.BIOMETRIC_SUCCESS -> true
-            else -> false
-        }
+    private fun unknownAuthenticationMethod(@NonNull result: Result) {
+        result.error("invalid_arguments", "Unknown authentication method.", null)
     }
 
     /**
-     * Initiates biometric authentication and returns the result to Flutter.
+     * Checks if the user can authenticate with the given method on the device.
      *
+     * @param method The authentication method to check.
+     * @return `true` if the method is supported and available, `false` otherwise.
+     */
+    private fun canAuthenticate(method: AuthenticationMethod): Boolean {
+        return availability(method) == AuthenticationAvailability.AVAILABLE
+    }
+
+    /**
+     * Checks the availability of the given method on the device.
+     *
+     * @param method The authentication method to check.
+     * @return The availability of the method, with the reason why when it is not available.
+     */
+    private fun availability(method: AuthenticationMethod): AuthenticationAvailability {
+        val context = activity ?: applicationContext ?: return AuthenticationAvailability.NOT_AVAILABLE
+        return AuthenticationAvailability.of(context, method)
+    }
+
+    /**
+     * Returns the kind of biometric hardware of the device.
+     */
+    private fun biometryType(): BiometryType {
+        val context = activity ?: applicationContext ?: return BiometryType.NONE
+        return BiometryType.of(context)
+    }
+
+    /**
+     * Dismisses the authentication prompt that is being shown.
+     *
+     * The authentication in progress fails with [BiometricPrompt.ERROR_CANCELED].
+     *
+     * @return `true` if there was a prompt to dismiss, `false` otherwise.
+     */
+    private fun cancelAuthentication(): Boolean {
+        val prompt = currentPrompt ?: return false
+        prompt.cancelAuthentication()
+        return true
+    }
+
+    /**
+     * Initiates authentication with the given method and returns the result to Flutter.
+     *
+     * @param method The authentication method to use.
      * @param result The result to send back to Flutter.
      */
-    private fun authenticate(@NonNull result: Result) {
+    private fun authenticate(method: AuthenticationMethod, @NonNull result: Result) {
+        if (!method.isSupported) {
+            result.error(
+                "unsupported_method",
+                "Authentication method '${method.key}' is not supported on this version of Android.",
+                null
+            )
+            return
+        }
         activity?.let {
             val executor = ContextCompat.getMainExecutor(it)
             val biometricPrompt = BiometricPrompt(it, executor,
                 object : BiometricPrompt.AuthenticationCallback() {
                     override fun onAuthenticationError(errorCode: Int, errorMessage: CharSequence) {
+                        currentPrompt = null
                         val details = mapOf(
+                            "reason" to AuthenticationErrorReason.from(errorCode).key,
                             "errorCode" to errorCode,
                             "message" to errorMessage.toString()
                         )
@@ -105,22 +164,27 @@ class FlutterLocalAuthenticationPlugin : FlutterPlugin, MethodCallHandler, Activ
                     }
 
                     override fun onAuthenticationSucceeded(authResult: BiometricPrompt.AuthenticationResult) {
+                        currentPrompt = null
                         result.success(true)
                     }
                 })
+            currentPrompt = biometricPrompt
 
-            val promptInfo = BiometricPrompt.PromptInfo.Builder()
+            val promptInfoBuilder = BiometricPrompt.PromptInfo.Builder()
                 .setTitle(localizationModel.dialogTitle)
                 .setSubtitle(localizationModel.reason)
-                .setNegativeButtonText(localizationModel.cancelButtonTitle)
-                .build()
+                .setAllowedAuthenticators(method.authenticators)
+            // A negative button is not allowed when the device credential is an allowed authenticator.
+            if (!method.allowsDeviceCredential) {
+                promptInfoBuilder.setNegativeButtonText(localizationModel.cancelButtonTitle)
+            }
 
-            biometricPrompt.authenticate(promptInfo)
+            biometricPrompt.authenticate(promptInfoBuilder.build())
         } ?: run {
             result.error(
                 "null_pointer_exception",
-                "FragmentActivity is null. ",
-                "Beware that a FlutterFragmentActivity is required instead of a FlutterActivity."
+                "The plugin is not attached to a FragmentActivity.",
+                "BiometricPrompt needs a FragmentActivity: make your MainActivity extend FlutterFragmentActivity instead of FlutterActivity."
             )
         }
     }
@@ -139,7 +203,9 @@ class FlutterLocalAuthenticationPlugin : FlutterPlugin, MethodCallHandler, Activ
      * @param binding The ActivityPluginBinding instance.
      */
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        activity = binding.activity as FlutterFragmentActivity
+        // Only a FragmentActivity can show a BiometricPrompt. Any other host still gets
+        // canAuthenticate / getAvailability, and a descriptive error from authenticate.
+        activity = binding.activity as? FragmentActivity
         channel.setMethodCallHandler(this)
     }
 
@@ -158,7 +224,9 @@ class FlutterLocalAuthenticationPlugin : FlutterPlugin, MethodCallHandler, Activ
      * @param binding The ActivityPluginBinding instance.
      */
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        activity = binding.activity as FlutterFragmentActivity
+        // Only a FragmentActivity can show a BiometricPrompt. Any other host still gets
+        // canAuthenticate / getAvailability, and a descriptive error from authenticate.
+        activity = binding.activity as? FragmentActivity
         channel.setMethodCallHandler(this)
     }
 

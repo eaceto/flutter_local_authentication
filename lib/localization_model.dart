@@ -2,7 +2,7 @@
 ///
 /// Author: Ezequiel (Kimi) Aceto
 /// Email: ezequiel.aceto@gmail.com
-/// Website: https://eaceto.dev
+/// Website: https://kimi.blog
 class LocalizationModel {
   /// The title for the authentication prompt dialog.
   final String promptDialogTitle;

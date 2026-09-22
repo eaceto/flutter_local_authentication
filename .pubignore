@@ -1,0 +1,27 @@
+# A .pubignore replaces the .gitignore of the same directory when publishing,
+# so everything that must stay out of the package has to be listed here.
+
+# Documentation site, published to GitHub Pages
+docs/
+mkdocs.yml
+/site/
+
+# Build outputs and generated files
+build/
+.dart_tool/
+pubspec.lock
+Podfile.lock
+Pods/
+.symlinks/
+.build/
+.swiftpm/
+**/Flutter/ephemeral/
+GeneratedPluginRegistrant.*
+generated_plugin_registrant.dart
+.flutter-plugins
+.flutter-plugins-dependencies
+local.properties
+.gradle/
+xcuserdata/
+.DS_Store
+.idea/

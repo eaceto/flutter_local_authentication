@@ -1,0 +1,55 @@
+name: docs
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'lib/**'
+      - '.github/workflows/docs.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build documentation
+    runs-on: ubuntu-latest
+    steps:
+    # Checks out a copy of the repo.
+    - name: Check out code
+      uses: actions/checkout@v4
+    # Build the documentation site from the docs folder
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+    - run: pip install -r docs/requirements.txt
+    - run: mkdocs build --strict --site-dir site
+    # Build the Dart API reference into /api
+    - uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+    - run: flutter pub get
+    - run: dart doc --output site/api
+    - uses: actions/upload-pages-artifact@v3
+      with:
+        path: site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+    - id: deployment
+      uses: actions/deploy-pages@v4

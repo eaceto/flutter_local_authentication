@@ -7,14 +7,35 @@ import io.flutter.plugin.common.MethodCall
  */
 sealed class PluginMethod {
     /**
-     * Check if biometric authentication is available on the device.
+     * Check if authentication is available on the device.
+     *
+     * @property method The authentication method to check, or null if it is unknown.
      */
-    object CanAuthenticate : PluginMethod()
+    data class CanAuthenticate(val method: AuthenticationMethod?) : PluginMethod()
 
     /**
-     * Perform biometric authentication.
+     * Perform authentication.
+     *
+     * @property method The authentication method to use, or null if it is unknown.
      */
-    object Authenticate : PluginMethod()
+    data class Authenticate(val method: AuthenticationMethod?) : PluginMethod()
+
+    /**
+     * Get the availability of an authentication method, with the reason why when it is not available.
+     *
+     * @property method The authentication method to check, or null if it is unknown.
+     */
+    data class GetAvailability(val method: AuthenticationMethod?) : PluginMethod()
+
+    /**
+     * Get the kind of biometrics of the device.
+     */
+    object GetBiometryType : PluginMethod()
+
+    /**
+     * Dismiss the authentication prompt that is being shown.
+     */
+    object CancelAuthentication : PluginMethod()
 
     /**
      * Set the allowable reuse duration for Touch ID authentication (iOS/macOS only).
@@ -44,8 +65,11 @@ sealed class PluginMethod {
          */
         fun from(call: MethodCall): PluginMethod? {
             return when (call.method) {
-                "canAuthenticate" -> CanAuthenticate
-                "authenticate" -> Authenticate
+                "canAuthenticate" -> CanAuthenticate(AuthenticationMethod.from(call.arguments as? Map<String, Any>))
+                "authenticate" -> Authenticate(AuthenticationMethod.from(call.arguments as? Map<String, Any>))
+                "getAvailability" -> GetAvailability(AuthenticationMethod.from(call.arguments as? Map<String, Any>))
+                "getBiometryType" -> GetBiometryType
+                "cancelAuthentication" -> CancelAuthentication
                 "setTouchIDAuthenticationAllowableReuseDuration" -> {
                     val arguments = call.arguments as? Map<String, Any>
                     val duration = arguments?.get("duration") as? Double ?: 0.0

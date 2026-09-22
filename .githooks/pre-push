@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -eu
+
+repo_root=$(git rev-parse --show-toplevel)
+cd "$repo_root"
+
+echo "Running Flutter analyzer for the plugin..."
+flutter analyze
+
+echo "Running Flutter analyzer for the example app..."
+(
+  cd example
+  flutter analyze
+)
+
+echo "Flutter analysis passed."
