@@ -91,6 +91,24 @@ jobs:
     - run: flutter build linux --debug
       working-directory: example
 
+  windows:
+    name: Windows build and unit tests
+    if: |
+      github.repository_owner == 'eaceto' &&
+      github.event.pull_request.draft != true
+    runs-on: windows-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+    - uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        cache: true
+    - run: flutter build windows --debug
+      working-directory: example
+    - run: ctest --test-dir build/windows/x64 -C Debug --output-on-failure
+      working-directory: example
+
   darwin:
     name: iOS and macOS build
     if: |

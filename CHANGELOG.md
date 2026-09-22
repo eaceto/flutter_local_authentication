@@ -1,3 +1,8 @@
+## 2.1.0
+
+- Add Windows Hello support for `canAuthenticate`, `getAvailability`, `getBiometryType`, `authenticate` and `cancelAuthentication`
+- Windows uses the system-selected Windows Hello verifier and reports `multiple` for the biometry type because Windows does not expose the enrolled sensor through this API
+
 ## 2.0.0
 
 - Add `AuthenticationMethod` (biometricsOnly, biometricsOrDeviceCredential, deviceCredentialOnly) as an optional `method` parameter of `canAuthenticate` and `authenticate`, on Android, iOS, macOS and Linux. Users without enrolled biometrics can authenticate with their device credential (thanks @tmpfs for the idea in #6)

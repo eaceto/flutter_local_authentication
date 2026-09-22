@@ -16,11 +16,11 @@ auth.setLocalizationModel(
 
 ## Where each text is shown
 
-| Field                | Android                     | iOS / macOS                         | Linux |
-| -------------------- | --------------------------- | ----------------------------------- | ----- |
-| `promptDialogTitle`  | Title of the prompt         | Not used, the system sets the title | —     |
-| `promptDialogReason` | Subtitle of the prompt      | Reason shown in the prompt          | —     |
-| `cancelButtonTitle`  | Negative button<sup>1</sup> | Cancel button                       | —     |
+| Field                | Android                     | iOS / macOS                         | Windows | Linux |
+| -------------------- | --------------------------- | ----------------------------------- | ------- | ----- |
+| `promptDialogTitle`  | Title of the prompt         | Not used, the system sets the title | Not used | — |
+| `promptDialogReason` | Subtitle of the prompt      | Reason shown in the prompt          | Message shown in the prompt | — |
+| `cancelButtonTitle`  | Negative button<sup>1</sup> | Cancel button                       | System-provided cancel action | — |
 
 <sup>1</sup> Android does not show a negative button when the device credential is an allowed authenticator (`biometricsOrDeviceCredential` and `deviceCredentialOnly`). The system provides its own way to cancel.
 

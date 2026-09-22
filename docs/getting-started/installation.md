@@ -15,7 +15,7 @@ Or add it to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_local_authentication: ^2.0.0
+  flutter_local_authentication: ^2.1.0
 ```
 
 Then run `flutter pub get`.

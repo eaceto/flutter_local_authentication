@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_local_authentication'
-  s.version          = '2.0.0'
+  s.version          = '2.1.0'
   s.summary          = 'A flutter plugin that allows access to Local Authentication'
   s.description      = <<-DESC
 A flutter plugin that allows access to Local Authentication / Biometrics on iOS, macOS, Linux and Android.

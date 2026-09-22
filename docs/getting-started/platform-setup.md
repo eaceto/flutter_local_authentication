@@ -62,10 +62,4 @@ fprintd-enroll             # enroll a fingerprint for the current user
 
 ## Windows
 
-Windows is not implemented yet. Calls to the plugin throw a `MissingPluginException`, so guard them:
-
-```dart
-if (!Platform.isWindows) {
-  // use the plugin
-}
-```
+Windows Hello is supported on Windows 10 version 1607 or newer. The current Windows user must have Windows Hello configured. The system selects the available Hello verifier, which can be a PIN, face, iris or fingerprint.

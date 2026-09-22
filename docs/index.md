@@ -19,7 +19,7 @@ if (await auth.canAuthenticate()) {
 - **`getBiometryType`**: label your UI with Face ID, fingerprint…
 - **Typed errors**: one `AuthenticationException` with the same reasons on every platform.
 - **`cancelAuthentication`**: dismiss the prompt from your app.
-- **Localization** of the prompt on Android, iOS and macOS.
+- **Localization** of the prompt on Android, iOS, macOS and Windows.
 - **Touch ID allowable reuse duration** on iOS and macOS.
 
 ## Supported platforms
@@ -30,7 +30,7 @@ if (await auth.canAuthenticate()) {
 | iOS      | iOS 15                       | `LocalAuthentication`            |
 | macOS    | macOS 12                     | `LocalAuthentication`            |
 | Linux    | Any, with `fprintd`          | `fprintd` (fingerprint)          |
-| Windows  | Not implemented yet          | Windows Hello is a work in progress |
+| Windows  | Windows 10 version 1607 or newer | Windows Hello |
 
 The plugin requires **Flutter 3.44** / **Dart 3.12** or newer.
 

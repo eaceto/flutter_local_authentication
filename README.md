@@ -1,6 +1,6 @@
 # Local Authentication
 
-A flutter plugin that allows access to Local Authentication / Biometrics on iOS, macOS, Linux and Android (Windows Hello is a work in progress).
+A flutter plugin that allows access to Local Authentication / Biometrics on iOS, macOS, Linux, Android and Windows Hello.
 
 📖 **Documentation**: [eaceto.github.io/flutter_local_authentication](https://eaceto.github.io/flutter_local_authentication/) (setup, guides and API reference)
 
@@ -29,7 +29,7 @@ A flutter plugin that allows access to Local Authentication / Biometrics on iOS,
 
 - Read/Write macOS/iOS **touchIDAuthenticationAllowableReuseDuration** value
 
-- Localized messages for iOS, macOS and Android
+- Localized messages for iOS, macOS, Android and Windows
 
 - Tells **why** the user can not authenticate (**getAvailability**), and which biometrics the device has (**getBiometryType**)
 
@@ -114,11 +114,11 @@ Both _canAuthenticate_ and _authenticate_ accept an optional **method**, that de
 
 When a method is not supported by the platform _canAuthenticate_ returns **false**, _getAvailability_ returns **unsupportedMethod**, and _authenticate_ throws an _AuthenticationException_ with reason **unsupportedMethod**.
 
-| Method                       | Android           | iOS | macOS | Linux |
-| ---------------------------- | ----------------- | --- | ----- | ----- |
-| biometricsOnly               | ✅                | ✅  | ✅    | ✅    |
-| biometricsOrDeviceCredential | ✅                | ✅  | ✅    | ❌    |
-| deviceCredentialOnly         | ✅ API 30 or newer | ✅  | ✅    | ❌    |
+| Method                       | Android           | iOS | macOS | Linux | Windows |
+| ---------------------------- | ----------------- | --- | ----- | ----- | ------- |
+| biometricsOnly               | ✅                | ✅  | ✅    | ✅    | ✅      |
+| biometricsOrDeviceCredential | ✅                | ✅  | ✅    | ❌    | ✅      |
+| deviceCredentialOnly         | ✅ API 30 or newer | ✅  | ✅    | ❌    | ✅      |
 
 ### Availability, biometry type and errors
 
@@ -169,10 +169,7 @@ The function _canAuthenticate_ will return **true** in the following scenarios, 
 - macOS 12 or newer
 - Linux (requires libfprint)
 - Android 7.0 (API 24) or newer
-
-## Next Steps
-
-- Add support to Windows Hello
+- Windows 10 version 1607 or newer with Windows Hello configured
 
 ## Publishing a new version
 

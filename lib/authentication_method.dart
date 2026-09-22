@@ -10,18 +10,18 @@
 enum AuthenticationMethod {
   /// Biometrics only (Face ID, Touch ID, fingerprint, face unlock, ...).
   ///
-  /// Supported on Android, iOS, macOS and Linux. This is the default.
+  /// Supported on Android, iOS, macOS, Linux and Windows. This is the default.
   biometricsOnly,
 
   /// Biometrics, falling back to the device credential (PIN, pattern, passcode
   /// or password). Users without enrolled biometrics can still authenticate.
   ///
-  /// Supported on Android, iOS and macOS.
+  /// Supported on Android, iOS, macOS and Windows.
   biometricsOrDeviceCredential,
 
   /// Device credential only (PIN, pattern, passcode or password).
   ///
-  /// Supported on Android 11 (API 30) or newer, iOS and macOS.
+  /// Supported on Android 11 (API 30) or newer, iOS, macOS and Windows.
   deviceCredentialOnly,
 }
 

@@ -88,4 +88,20 @@ Backed by [`fprintd`](https://fprint.freedesktop.org/), so only fingerprints are
 
 ## Windows
 
-Not implemented yet. Every call throws a `MissingPluginException`. Windows Hello support is planned.
+Backed by the Windows Runtime [`UserConsentVerifier`](https://learn.microsoft.com/en-us/uwp/api/windows.security.credentials.ui.userconsentverifier) API.
+
+- `canAuthenticate` and `getAvailability` check whether Windows Hello is available and configured for the current user.
+- `authenticate` shows the Windows Hello verification prompt associated with the app window.
+- `cancelAuthentication` cancels the verification in progress.
+- `getBiometryType` returns `multiple`: Windows does not expose whether the configured Hello device is face, iris or fingerprint through this API.
+- Windows selects the available Hello method itself. The three `AuthenticationMethod` values are accepted, but Windows may use a PIN or another configured Hello verifier even when the method is named `biometricsOnly`.
+
+Availability maps as follows:
+
+| Windows Hello availability | `AuthenticationAvailability` |
+| -------------------------- | ---------------------------- |
+| `Available`                 | `available`                   |
+| `NotConfiguredForUser`      | `notEnrolled`                 |
+| `DeviceBusy`, `DeviceNotPresent`, `DisabledByPolicy` | `notAvailable` |
+
+Verification results map to the shared `AuthenticationErrorReason`: `Canceled` → `userCanceled`, `RetriesExhausted` → `lockedOut`, `NotConfiguredForUser` → `notEnrolled`, unavailable-device results → `notAvailable`, and other unsuccessful results → `failed`.

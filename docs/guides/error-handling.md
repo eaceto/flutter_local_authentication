@@ -2,7 +2,7 @@
 
 `authenticate` returns `true` when the user is authenticated. In **every other case it throws** an `AuthenticationException`, so a call without a `try` / `catch` is a bug.
 
-The exception is Windows, where the plugin is not implemented and every call throws a `MissingPluginException`.
+Windows uses the system Windows Hello verifier and reports the same `AuthenticationException` reasons as the other platforms.
 
 ```dart
 try {

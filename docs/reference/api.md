@@ -76,7 +76,7 @@ Dismisses the prompt that is being shown. The pending `authenticate` call throws
 Future<void> setLocalizationModel(LocalizationModel localizationModel)
 ```
 
-Sets the texts of the following prompts. Applies to Android, iOS and macOS, and does nothing on other platforms. The returned future completes when the platform has stored the model. See [localization](../guides/localization.md).
+Sets the texts of the following prompts. Applies to Android, iOS, macOS and Windows, and does nothing on Linux. The returned future completes when the platform has stored the model. See [localization](../guides/localization.md).
 
 ### `setTouchIDAuthenticationAllowableReuseDuration`
 
