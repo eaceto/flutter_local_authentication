@@ -93,7 +93,8 @@ Backed by the Windows Runtime [`UserConsentVerifier`](https://learn.microsoft.co
 - `canAuthenticate` and `getAvailability` check whether Windows Hello is available and configured for the current user.
 - `authenticate` shows the Windows Hello verification prompt associated with the app window.
 - `cancelAuthentication` cancels the verification in progress.
-- `getBiometryType` returns `multiple`: Windows does not expose whether the configured Hello device is face, iris or fingerprint through this API.
+- `getBiometryType` returns `multiple` when Windows Hello is available, and `none` otherwise: Windows does not expose whether the configured Hello device is face, iris or fingerprint through this API.
+- `authenticate` fails with `notAvailable` when the app has no Flutter view hosted in a top-level window.
 - Windows selects the available Hello method itself. The three `AuthenticationMethod` values are accepted, but Windows may use a PIN or another configured Hello verifier even when the method is named `biometricsOnly`.
 
 Availability maps as follows:

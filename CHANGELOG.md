@@ -1,3 +1,11 @@
+## 2.1.1
+
+- Windows: show the Windows Hello prompt for the app's top-level window. The window was looked up before the runner attached the Flutter view to it, so the prompt was associated with the wrong window
+- Windows: `getBiometryType` returns `none` when Windows Hello is not available, as on the other platforms
+- Windows: an empty `promptDialogReason` keeps the default prompt message
+- Windows: fix the signature of `IUserConsentVerifierInterop::RequestVerificationForWindowAsync`, which did not match the Windows SDK and would crash when authenticating
+- Windows: reply to Dart on the platform thread instead of the WinRT thread pool
+
 ## 2.1.0
 
 - Add Windows Hello support for `canAuthenticate`, `getAvailability`, `getBiometryType`, `authenticate` and `cancelAuthentication`
